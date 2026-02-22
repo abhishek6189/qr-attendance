@@ -15,29 +15,39 @@ async function generateQR() {
     return;
   }
 
-  const response = await fetch("http://localhost:3000/register-employee", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ empId, name, dept })
-  });
+  try {
+    const response = await fetch(
+      "https://qr-attendance-backend-pjjp.onrender.com/register-employee",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ empId, name, dept })
+      }
+    );
 
-  const data = await response.json();
+    const data = await response.json();
 
-  const qrDiv = document.getElementById("qr");
+    if (!response.ok) {
+      alert(data.message || "Failed to register employee");
+      return;
+    }
 
-  // ❗ DO NOT clear again after this
-  qrDiv.innerHTML = "";
+    const qrDiv = document.getElementById("qr");
+    qrDiv.innerHTML = "";
 
-  new QRCode(qrDiv, {
-    text: data.qrData,
-    width: 200,
-    height: 200
-  });
+    new QRCode(qrDiv, {
+      text: data.qrData,
+      width: 200,
+      height: 200
+    });
 
-  console.log("QR GENERATED");
+    console.log("QR GENERATED");
+
+  } catch (error) {
+    alert("Server not reachable. Please try again.");
+    console.error(error);
+  }
 }
-
-
 
 function resetForm() {
   document.getElementById("empId").value = "";
